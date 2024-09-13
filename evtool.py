@@ -164,17 +164,6 @@ def setimagewithwcs(fitsreference,racen,deccen,radius,dimmig,rebin,overlap):
     #
     #evtool eventfiles='%s' outfile='%s' region='%s' image='yes' size='%s' rebin='80'  overlap='2.0'
     #python=fits.open('~/Erosita/datool_pythonV2/testspython/res12238_75/2
-    #/event_python1679390257_1679478586.470288.fits')
-
-    #this%delta(:) = this%delta(:) * rebin
-    #this%refpix(1) = this%refpix(1) + resolution(1) * rebin(1) / 2.0_r8
-    #this%refpix(2) = this%refpix(2) + resolution(2) * rebin(2) / 2.0_r8
-    #! 0.5 / rebin to account for rebin
-    #this%refpix(1) = this%refpix(1) / rebin(1) - 0.5_r8 + 0.5_r8 / rebin(1)
-    #this%refpix(2) = this%refpix(2) / rebin(2) - 0.5_r8 + 0.5_r8 / rebin(2)
-    #this%cdelt1p = rebin(1)
-    #this%cdelt2p = rebin(2)
-    #fitsreference[0].header
     newimg=np.zeros((dimmig, dimmig,))
     fitsreference[0].data=newimg
     radat     =list(fitsreference[1].data['ra'] )
@@ -184,8 +173,8 @@ def setimagewithwcs(fitsreference,racen,deccen,radius,dimmig,rebin,overlap):
     locw.wcs.ctype=['RA---SIN' , 'DEC--SIN']
     locw.wcs.crval=[racen,deccen]
     locw.wcs.crpix=[dimmig/2+0.5,dimmig/2+0.5]
+     # 2.*1.15*.75/1552.
     cdelt=2*1.15*radius/dimmig
-    # 2.*1.15*.75/1552.
 
     locw.wcs.cdelt=[-1*cdelt,cdelt ]
     ##x, y = w.all_world2pix(radat, decdat, 1)
@@ -313,19 +302,10 @@ def check_input(args):#,dictparam):
         #fill a dictionnary of the arguments
         for elem in args[1:]:
             if '=' in elem :
-                #spltparam=elem.split('=')
-                #dictparam[spltparam[0]]=spltparam[1]
                 dictparam[elem.split('=')[0]]=elem.split('=')[1]
     #check all needed params are given, if not ask for them
-    #neededkeys=['sourcefile','ra0','dec0','Radius','outfolder']
-    print (dictparam)
-    print ("-------")
-    print (dictparam.keys())
-    print ("-------")
     for crtkey in neededkeys:
         if crtkey not in dictparam.keys():
-            #var = input(f"Please enter value for {crtkey}>")
-            #dictparam[crtkey]=var
             dictparam[crtkey]= input(f"Please enter value for {crtkey}>")
 
     infile=dictparam['sourcefile']
@@ -347,13 +327,13 @@ def check_input(args):#,dictparam):
             print (lclstr)
             return  None
 
-    #chek ra-0 is a numerical value between 0 and 360
+    #check ra-0 is a numerical value between 0 and 360
     try:
         ra0=float(dictparam['ra0'])
     except ValueError:
         print ("the reference RA must be a float value ")
         return None
-    #chek dec-0 is a numerical value between -90 and 90
+    #check dec-0 is a numerical value between -90 and 90
 
     try:
         dec0=float(dictparam['dec0'])
@@ -419,94 +399,15 @@ def main(args):
     dictparam=check_input(args)#,dictparam)
     if dictparam is None:
         return None
-    #if len (args)>1:
-    #    if  args[1].lower().strip()=="--help"  or args[1].lower().strip()=="-h":
-    #        help_err_message(args[0])
-    #        return None
-    #    #fill a dictionnary of the arguments
-    #    for elem in args[1:]:
-    #        if '=' in elem :
-    #            spltparam=elem.split('=')
-    #            dictparam[spltparam[0]]=spltparam[1]
-    ##check all needed params are given, if not ask for them
-    #for crtkey in neededkeys:
-    #    if crtkey not in dictparam.keys():
-    #        var = input(f"Please enter value for {crtkey}>")
-    #        dictparam[crtkey]=var
-    #infile=dictparam['sourcefile']
-    #if not os.path.isfile(infile):
-    #    lclstr=f"ERROR: input file {infile}\n\tcan't be found, please check it exists,
-    # or that you have access to it"
-    #    print (lclstr)
-    #    return None
-    #outfolder=dictparam['outfolder']
-    #if not os.path.isdir(outfolder ):
-    #    try:
-    #        lclstr=f"WARNING: result folder{outfolder} \n\tcan't be found, try to create it "
-    #        print (lclstr)
-    #        os.mkdir(outfolder)
-    #    except:
-    #        lclstr = f"ERROR: result folder {outfolder} \n\tdoes not exist and can't be created,
-    #Please check the output folder exist or you have right to create it"
-    #        print (lclstr)
-    #        return  None
-    #
-    ##chek ra-0 is a numerical value between 0 and 360
-    #try:
-    #    ra0=float(dictparam['ra0'])
-    #except:
-    #    print ("the reference RA must be a float value ")
-    #    return None
-    ##chek dec-0 is a numerical value between -90 and 90
-    #
-    #try:
-    #    dec0=float(dictparam['dec0'])
-    #except:
-    #    print ("the reference DEC must be a float value ")
-    #    return None
-    #try:
-    #    radius=float(dictparam['Radius'])
-    #except:
-    #    print ("the Radius must be a float value (in  degree)")
-    #    return None
-    #
-    #if ra0<0 or ra0>360:
-    #    print ("ERROR: ra0 must be > 0 and < 360 degree, given as a numerical value ")
-    #    return None
-    #
-    #if dec0<-90 or dec0>90:
-    #    print ("ERROR: dec0 must be > -90 and < 90 degree, given as a numerical value ")
-    #    return None
-    ##print ("radius =",radius)
-    imageflag=False
+     imageflag=False
     if 'image' in  dictparam.keys():
     #    #if isinstance(dictparam['image'], (bool)):
         if dictparam['image'].lower() in ('yes','y','true','t',1):
             imageflag=True
 
-    #        if 'size' not in dictparam.keys() :
-    #            print ("ERROR: when parameter image is given the parameter size MUST be provided")
-    #            return None
-    #    elif dictparam['image'].lower() in ('no','n','false','f',0):
-    #        imageflag=False
-    #    else:
-    #        print ("ERROR: parameter image must be boolean  ")
-    #        return None
-    #dimimg=None
-    #if 'size' in  dictparam.keys():
-    #    try :
-    #        dimimg=int(dictparam['size'])
-    #    except :
-    #        print ("ERROR: parameter size when provided must be integer")
-    #        return None
 
-
-#    if 'image' in  dictparam.keys() and 'size' not in dictparam.keys() :
-#        print ("ERROR: when parameter image is given the parameter size MUST be provided")
-#        return None
     rebin=80
     overlap=2
-    #evtool_main(infile ,outfolder,ra0,dec0,radius,imageflag,dimimg,rebin,overlap)
     evtool_main(dictparam['sourcefile'],
                 dictparam['outfolder'] ,
                 float(dictparam['ra0']),
