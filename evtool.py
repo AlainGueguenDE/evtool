@@ -50,7 +50,9 @@ import numpy as np
 ! resultfolder  folder to save the extracted region
 !Output :
 ! produce a new file
-!
+! NOTE: this code is a direct port from fortran to python of a eSASS task.
+!        the first version conctains as comment the original fortrna code
+!        later version should ocntains only comment and python code
 """
 # evtool eventfiles='%s' outfile='%s' region='%s' image='yes' size='%s' rebin='80'
 # overlap='2.0'
